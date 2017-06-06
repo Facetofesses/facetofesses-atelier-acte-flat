@@ -68,6 +68,10 @@ input {
   left: 0;
 }
 
+.screen, .tablet {
+  display: none;
+}
+
 .tablet {
   background: url(../img/gradient.png) no-repeat;
   background-size: cover;

@@ -53,7 +53,8 @@ export default class Piece {
     let index = 0
     for (iAngle = -360/12, index = 0; iAngle <= 360 + 360/12; iAngle+=360/6, index++) {
       if (angle < iAngle + ANGLE_DETECTION_INTERVAL && angle > iAngle - ANGLE_DETECTION_INTERVAL) {
-        selectionIndex = index
+        selectionIndex = (index) % 6
+        console.log(selectionIndex)
         this.onSelectionChange(selectionIndex)
       }
     }

@@ -21,15 +21,18 @@ export default class App {
     this.waitFontsReady()
   }
 
+  /**
+   * Hide/show device container and start app
+   */
   start () {
     dbg('start')
     /* eslint no-new:0 */
     if (isMobile()) {
-      selectClass('screen').style.display = 'none'
+      selectClass('tablet').style.display = 'block'
       SocketClient.setKey('tablet')
       SocketClient.start(Tablet.start.bind(Tablet))
     } else {
-      selectClass('tablet').style.display = 'none'
+      selectClass('screen').style.display = 'block'
       SocketClient.setKey('screen')
       SocketClient.start(() => {
         new Screen()
