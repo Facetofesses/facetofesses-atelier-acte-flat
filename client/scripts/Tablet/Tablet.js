@@ -18,6 +18,9 @@ class Tablet {
     }
   }
 
+  /**
+   * Animate background bubbles (position and scale)
+   */
   animateBubbles () {
     // place bubbles
     this.$els.bubbles.forEach((bubble) => {

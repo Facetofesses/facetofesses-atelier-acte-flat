@@ -11,7 +11,7 @@ export default class Piece {
   constructor (pieceConfig) {
     this.config = pieceConfig
     this.id = this.config.id
-    this.currentSplit = null
+    this.currentTextSplit = null
     this.lastSelectionIndex = 5
 
     this.initializeElements()
@@ -25,6 +25,9 @@ export default class Piece {
     }
   }
 
+  /**
+   * Get all useful DOM elements
+   */
   initializeElements () {
     this.$els = {
       container: selectClass(this.id),
@@ -38,31 +41,43 @@ export default class Piece {
     }
   }
 
+  /**
+   * Initialize events
+   */
   initializeEvents () {
     this.$els.background.addEventListener('touchstart', this.onBackgroundTouch.bind(this))
   }
 
+  /**
+   * Event triggered on piece touch
+   * @param e
+   */
   onBackgroundTouch (e) {
     const angle = this.getTouchAngle({
       x: e.pageX,
       y: e.pageY
     }, this.backgroundCenter)
 
+
+    // Get nearest index
     let selectionIndex = 0
     let iAngle = -360/12
     let index = 0
     for (iAngle = -360/12, index = 0; iAngle <= 360 + 360/12; iAngle+=360/6, index++) {
       if (angle < iAngle + ANGLE_DETECTION_INTERVAL && angle > iAngle - ANGLE_DETECTION_INTERVAL) {
         selectionIndex = (index) % 6
-        console.log(selectionIndex)
         this.onSelectionChange(selectionIndex)
       }
     }
   }
 
+  /**
+   * Event triggered when selected piece position change
+   * @param selectionIndex
+   */
   onSelectionChange (selectionIndex) {
     if (selectionIndex !== this.lastSelectionIndex) {
-      // show text
+      // show new text
       this.animateText(this.config.selections[selectionIndex] || '')
 
       // upper element rotation
@@ -83,20 +98,30 @@ export default class Piece {
     }
   }
 
+  /**
+   * Calculate an angle between 2 points
+   * @param p1
+   * @param p2
+   * @returns {number} Angle between the 2 points (in deg)
+   */
   getTouchAngle (p1, p2) {
     return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 180
   }
 
+  /**
+   * Animate text show / hide
+   * @param text
+   */
   animateText (text) {
     const showNew = () => {
       if (text) {
         this.$els.text.innerText = text
 
-        this.currentSplit = new SplitText(this.$els.text, {
+        this.currentTextSplit = new SplitText(this.$els.text, {
           type: 'chars'
         }).chars
 
-        TweenMax.staggerFromTo(this.currentSplit, 0.2, {
+        TweenMax.staggerFromTo(this.currentTextSplit, 0.2, {
           y: 10,
           autoAlpha: 0
         },  {
@@ -104,12 +129,12 @@ export default class Piece {
           autoAlpha: 1
         }, 0.05)
       } else {
-        this.currentSplit = null
+        this.currentTextSplit = null
       }
     }
 
-    if (this.currentSplit) {
-      TweenMax.staggerTo(this.currentSplit, 0.2, {
+    if (this.currentTextSplit) {
+      TweenMax.staggerTo(this.currentTextSplit, 0.2, {
         y: -10,
         autoAlpha: 0
       }, 0.05, showNew)

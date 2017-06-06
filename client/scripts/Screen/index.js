@@ -12,7 +12,7 @@ export default class Screen {
     this.partnerTextElement = document.getElementsByClassName('partner-text')[0]
     this.overlayElement = document.getElementsByClassName('overlay')[0]
 
-    // interactions
+    // interactions datas
     this.positionResponseTimeoutId = null
     this.positionResponseGaiaTimeoutId = null
     this.responses = ['Je t’aime...', 'Mon amour', 'Hum...c\'est tellement bon']
@@ -27,6 +27,9 @@ export default class Screen {
     SocketClient.instance.onmessage = this.onSocketMessage.bind(this)
   }
 
+  /**
+   * Load all gifs
+   */
   loadGifs () {
     const promises = []
     this.config.forEach(c => promises.push(this.loadGif(c)))
@@ -35,6 +38,11 @@ export default class Screen {
       .then(this.onGifsLoaded.bind(this))
   }
 
+  /**
+   * Load a gif
+   * @param configItem
+   * @returns {Promise.<TResult>}
+   */
   loadGif (configItem) {
     return fetch(configItem.resourceUrl)
       .then(data => data.blob())
@@ -43,10 +51,17 @@ export default class Screen {
       })
   }
 
+  /**
+   * Event triggered when all gifs are loaded
+   */
   onGifsLoaded () {
     this.updateAnimation()
   }
 
+  /**
+   * Event triggered when screen receive datas from tablet
+   * @param e
+   */
   onSocketMessage (e) {
     const datas = JSON.parse(e.data)
     this.updateState(datas.id, datas.selection)
@@ -55,6 +70,12 @@ export default class Screen {
     }
   }
 
+  /**
+   * Update state with datas from tablet
+   * Call method for interactions
+   * @param key
+   * @param value
+   */
   updateState (key, value) {
     this.state[key] = value
 
@@ -71,6 +92,9 @@ export default class Screen {
     }
   }
 
+  /**
+   * Called when position changed
+   */
   onPositionChange () {
     // clear timeouts
     if (this.positionResponseTimeoutId) {
@@ -90,12 +114,18 @@ export default class Screen {
     }, randomInt(10000, 15000))
   }
 
+  /**
+   * Called when sweet words have been sended
+   */
   onSweetWordsChange () {
     window.setTimeout(() => {
       this.write(this.responses[randomInt(0, this.responses.length - 1)])
     }, 1500)
   }
 
+  /**
+   * Update gif source with new datas (position and speed)
+   */
   updateAnimation () {
     const configItem = this.config.find((config) => {
       return config.position === this.state.position && config.speed === this.state.speed
@@ -113,6 +143,9 @@ export default class Screen {
       })
   }
 
+  /**
+   * Called when caress has been sended
+   */
   onCaress () {
     if (!this.caressTimeline) {
       this.caressTimeline = new TimelineMax({
@@ -133,6 +166,10 @@ export default class Screen {
     this.caressTimeline.seek(this.caressExcitation)
   }
 
+  /**
+   * Write text on screen
+   * @param text
+   */
   write (text) {
     if (this.writeTimeline && this.writeTimeline.isActive()) {
       this.writeTimeline.pause()

@@ -6,6 +6,9 @@ class PieceManager {
     this.createPieces()
   }
 
+  /**
+   * Create all pieces in config
+   */
   createPieces () {
     this.pieces = {}
 
