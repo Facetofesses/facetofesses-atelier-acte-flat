@@ -1,0 +1,184 @@
+{
+  "pieces": [
+    {
+      "id": "position",
+      "name": "position",
+      "indication": "Fais pivoter la pastille pour sélectionner une position",
+      "matrix": [
+        40,
+        40,
+        40
+      ],
+      "color": "0xFC6269",
+      "positions": [
+        {
+          "name": "LE LOTUS",
+          "color": "0xD7444B"
+        },
+        {
+          "name": "LA BROUETTE",
+          "color": "0xCE3A42"
+        },
+        {
+          "name": "L'OEUF",
+          "color": "0xC33037"
+        },
+        {
+          "name": "L'AMAZONE",
+          "color": "0xB4272E"
+        },
+        {
+          "name": "LA CUILLERE",
+          "color": "0xAA1D23"
+        },
+        {
+          "name": "LA BROUETTE",
+          "color": "0x9D131A"
+        },
+        {
+          "name": "LE MISSIONNAIRE",
+          "color": "0xF2585F"
+        },
+        {
+          "name": "LA LEVRETTE",
+          "color": "0xE44D54"
+        }
+      ]
+    },
+    {
+      "id": "speed",
+      "name": "vitesse",
+      "indication": "Fais pivoter la pastille pour modifier la vitesse",
+      "matrix": [
+        102,
+        114,
+        117
+      ],
+      "color": "0xFC6269",
+      "positions": [
+        {
+          "name": "X1",
+          "color": "0xD6679A"
+        },
+        {
+          "name": "X2",
+          "color": "0xCF5D90"
+        },
+        {
+          "name": "X3",
+          "color": "0xC15184"
+        },
+        {
+          "name": "X4",
+          "color": "0xBA467A"
+        },
+        {
+          "name": "X5",
+          "color": "0xAE3B6F"
+        },
+        {
+          "name": "X6",
+          "color": "0xA32F63"
+        },
+        {
+          "name": "X7",
+          "color": "0x982358"
+        },
+        {
+          "name": "X8",
+          "color": "0x8C174C"
+        }
+      ]
+    },
+    {
+      "id": "caress",
+      "name": "caresse",
+      "indication": "Fais pivoter la pastille pour modifier les caresses",
+      "matrix": [
+        50,
+        50,
+        50
+      ],
+      "color": "0x6FC2EF",
+      "positions": [
+        {
+          "name": "joue",
+          "color": "0x62B3DE"
+        },
+        {
+          "name": "penis",
+          "color": "0x57A5CF"
+        },
+        {
+          "name": "torse",
+          "color": "0x4D96BE"
+        },
+        {
+          "name": "cheveux",
+          "color": "0x4188B0"
+        },
+        {
+          "name": "cou",
+          "color": "0x377CA2"
+        },
+        {
+          "name": "oreille",
+          "color": "0x2B6C8F"
+        },
+        {
+          "name": "dos",
+          "color": "0x215C7F"
+        },
+        {
+          "name": "seins",
+          "color": "0x165070"
+        }
+      ]
+    },
+    {
+      "id": "sweet_words",
+      "name": "mots doux",
+      "indication": "Fais pivoter la pastille pour modifier les mots doux",
+      "matrix": [
+        50,
+        50,
+        50
+      ],
+      "color": "0x4BD1A4",
+      "positions": [
+        {
+          "name": "Hum...c'est tellement bon",
+          "color": "0x43C197"
+        },
+        {
+          "name": "T'es doux",
+          "color": "0x3CB58C"
+        },
+        {
+          "name": "Mon amour",
+          "color": "0x34A37E"
+        },
+        {
+          "name": "Moi aussi je t'aime",
+          "color": "0x2D9773"
+        },
+        {
+          "name": "A voir",
+          "color": "0x258866"
+        },
+        {
+          "name": "A voir",
+          "color": "0x1E795A"
+        },
+        {
+          "name": "A voir",
+          "color": "0x166A4D"
+        },
+        {
+          "name": "A voir",
+          "color": "0x0F5B41"
+        }
+      ]
+    }
+  ]
+}

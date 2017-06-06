@@ -1,0 +1,77 @@
+.overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.indication {
+  text-align: center;
+
+  span {
+    text-transform: uppercase;
+    color: #FFF;
+    white-space: nowrap;
+    margin: 0 15px;
+
+    &.margin {
+      margin-left: -200px;
+    }
+
+    &.source-big {
+      font-family: "Source Sans Pro", Arial, sans-serif;
+      font-weight: 100;
+      font-size: 60px;
+    }
+
+    &.source-small {
+      font-family: "Source Sans Pro", Arial, sans-serif;
+      font-weight: 100;
+      font-size: 40px;
+    }
+
+    &.blogger-small {
+      font-family: "Blogger Sans", Arial, sans-serif;
+      font-weight: bold;
+      font-size: 80px;
+    }
+
+    &.blogger-big {
+      font-family: "Blogger Sans", Arial, sans-serif;
+      font-weight: bold;
+      font-size: 100px;
+    }
+
+    &.align-top {
+      vertical-align: top;
+    }
+  }
+}
+
+
+.cursor {
+  text-align: center;
+  margin-top: 60px;
+
+  svg {
+    width: 149px;
+    display: inline-block;
+    position: relative;
+    overflow: visible;
+
+    #circle {
+      transform: scale(1);
+      transform-origin: 100% 100%;
+      animation: bounce 1s infinite;
+    }
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}

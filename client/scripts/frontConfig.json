@@ -1,0 +1,35 @@
+[
+  {
+    "resourceUrl": "/static/missionnaire-1.gif",
+    "position": 0,
+    "speed": 0
+  }, {
+    "resourceUrl": "/static/missionnaire-2.gif",
+    "position": 0,
+    "speed": 1
+  }, {
+    "resourceUrl": "/static/missionnaire-3.gif",
+    "position": 0,
+    "speed": 2
+  }, {
+    "resourceUrl": "/static/missionnaire-4.gif",
+    "position": 0,
+    "speed": 3
+  }, {
+    "resourceUrl": "/static/missionnaire-5.gif",
+    "position": 0,
+    "speed": 4
+  }, {
+    "resourceUrl": "/static/missionnaire-6.gif",
+    "position": 0,
+    "speed": 5
+  }, {
+    "resourceUrl": "/static/missionnaire-7.gif",
+    "position": 0,
+    "speed": 6
+  }, {
+    "resourceUrl": "/static/missionnaire-8.gif",
+    "position": 0,
+    "speed": 7
+  }
+]
