@@ -1,15 +1,27 @@
 import config from '../frontConfig.json'
 import SocketClient from '../utils/SocketClient'
+import {
+  randomInt
+} from '../utils/index'
 
 export default class Screen {
   constructor () {
     this.config = config
     this.loadGifs()
     this.animationContainer = document.getElementById('gif')
+    this.partnerTextElement = document.getElementsByClassName('partner-text')[0]
+    this.overlayElement = document.getElementsByClassName('overlay')[0]
+
+    // interactions
+    this.positionResponseTimeoutId = null
+    this.positionResponseGaiaTimeoutId = null
+    this.responses = ['Je t’aime...', 'Mon amour', 'Hum...c\'est tellement bon']
+    this.caressTimeline = null
+    this.caressExcitation = 0
 
     this.state = {
       position: null,
-      speed: 1
+      speed: 0
     }
 
     SocketClient.instance.onmessage = this.onSocketMessage.bind(this)
@@ -32,29 +44,115 @@ export default class Screen {
   }
 
   onGifsLoaded () {
-    console.log('gifs loaded')
-
-    this.updateState('position', 0)
     this.updateAnimation()
   }
 
   onSocketMessage (e) {
     const datas = JSON.parse(e.data)
-    this.updateState(datas.key, datas.value)
-    this.updateAnimation()
+    this.updateState(datas.id, datas.selection)
+    if (datas.id === 'position' || datas.id === 'speed') {
+      this.updateAnimation()
+    }
   }
 
   updateState (key, value) {
-    console.log('update', key, value)
     this.state[key] = value
+
+    switch (key) {
+      case 'position':
+        this.onPositionChange()
+        break
+      case 'sweet-words':
+        this.onSweetWordsChange()
+        break
+      case 'caress':
+        this.onCaress()
+        break
+    }
+  }
+
+  onPositionChange () {
+    // clear timeouts
+    if (this.positionResponseTimeoutId) {
+      clearTimeout(this.positionResponseTimeoutId)
+      this.positionResponseTimeoutId = null
+    }
+    if (this.positionResponseGaiaTimeoutId) {
+      clearTimeout(this.positionResponseGaiaTimeoutId)
+      this.positionResponseGaiaTimeoutId = null
+    }
+
+    this.positionResponseTimeoutId = window.setTimeout(() => {
+      this.write('Pfiou, je commence<br> à fatiguer...')
+      this.positionResponseGaiaTimeoutId = window.setTimeout(() => {
+        console.log('gaia: tu devrais changer de position')
+      }, 5000)
+    }, randomInt(0, 3000))
+  }
+
+  onSweetWordsChange () {
+    window.setTimeout(() => {
+      this.write(this.responses[randomInt(0, this.responses.length - 1)])
+    }, 1500)
   }
 
   updateAnimation () {
     const configItem = this.config.find((config) => {
       return config.position === this.state.position && config.speed === this.state.speed
     })
-    if (configItem) {
-      this.animationContainer.src = configItem.url
+
+    new TimelineMax()
+      .to(this.animationContainer, 0.5, {
+        autoAlpha: 0
+      })
+      .call(() => {
+        this.animationContainer.src = (configItem) ? configItem.url : ''
+      })
+      .to(this.animationContainer, 0.5, {
+        autoAlpha: 1
+      })
+  }
+
+  onCaress () {
+    if (!this.caressTimeline) {
+      this.caressTimeline = new TimelineMax({
+        paused: true
+      })
+        .fromTo(this.overlayElement, 1, {
+          backgroundColor: '#000000'
+        }, {
+          backgroundColor: '#673101'
+        })
     }
+
+    this.caressExcitation += 0.01
+    if (this.caressExcitation > 1) {
+      this.caressExcitation = 1
+    }
+
+    this.caressTimeline.seek(this.caressExcitation)
+  }
+
+  write (text) {
+    let tl = new TimelineMax()
+
+    if (this.partnerTextElement.innerHTML !== '') {
+      tl.to(this.partnerTextElement, 0.5, {
+        autoAlpha: 0
+      })
+    }
+
+    tl.call(() => {
+      this.partnerTextElement.innerHTML = text
+    })
+    .to(this.partnerTextElement, 0.5, {
+      autoAlpha: 1
+    })
+    tl.to(this.partnerTextElement, 0.5, {
+      autoAlpha: 0
+    }, '+=4')
+      .call(() => {
+        this.partnerTextElement.innerHTML = ''
+      })
   }
 }

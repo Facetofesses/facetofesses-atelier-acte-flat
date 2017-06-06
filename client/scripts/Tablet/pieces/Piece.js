@@ -2,12 +2,14 @@ import {
   selectClass
 } from '../../utils/index'
 import SplitText from '../../lib/SplitText'
+import SocketClient from '../../utils/SocketClient'
 
 export default class Piece {
   constructor (pieceConfig) {
     this.config = pieceConfig
     this.id = this.config.id
     this.currentSplit = null
+    this.lastSelectionIndex = 5
 
     this.initializeElements()
     this.initializeEvents()
@@ -38,20 +40,41 @@ export default class Piece {
   }
 
   onBackgroundTouch (e) {
-    let p2 = this.backgroundCenter
-    let p1 = {
+    const angle = this.getTouchAngle({
       x: e.pageX,
       y: e.pageY
+    }, this.backgroundCenter)
+
+    const selectionIndex = (Math.round(angle * 6 / 360) + 1) % 6
+
+    this.onSelectionChange(selectionIndex)
+  }
+
+  onSelectionChange (selectionIndex) {
+    if (selectionIndex !== this.lastSelectionIndex) {
+      // show text
+      this.animateText(this.config.selections[selectionIndex] || '')
+
+      // upper element rotation
+      TweenMax.to(this.$els.upperElement, 0.3, {
+        rotation: 60 + selectionIndex * 60
+      })
+
+      // send info to screen
+      if (this.config.selections[selectionIndex]) {
+        SocketClient.send('datas', {
+          id: this.id,
+          selection: selectionIndex,
+          text: this.config.selections[selectionIndex] || ''
+        })
+      }
+
+      this.lastSelectionIndex = selectionIndex
     }
+  }
 
-    let angle = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 180
-    const positionIndex = (Math.round(angle * 6 / 360) + 1) % 6
-
-    this.animateText(this.config.positions[positionIndex] || '')
-
-    TweenMax.to(this.$els.upperElement, 0.3, {
-      rotation: 60 + positionIndex * 60
-    })
+  getTouchAngle (p1, p2) {
+    return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI + 180
   }
 
   animateText (text) {

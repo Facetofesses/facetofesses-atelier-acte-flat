@@ -2,3 +2,8 @@
   font-family: "Blogger Sans";
   src: url("/static/BloggerSans.ttf");
 }
+
+@font-face {
+  font-family: "Reklame Script";
+  src: url("/static/reklamescript-medium-webfont.ttf");
+}

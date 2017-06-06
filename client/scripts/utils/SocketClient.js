@@ -1,8 +1,12 @@
 import SockJS from 'sockjs-client'
 
-const SOCKET_URL = 'http://192.168.1.34:8090/ws'
+const SOCKET_URL = 'http://192.168.1.56:8090/ws'
 
 class SocketClient {
+  constructor () {
+    this.onOpenCallback = null
+  }
+
   /**
    * @param key
    */
@@ -13,7 +17,8 @@ class SocketClient {
   /**
    * Connect to socket server
    */
-  start () {
+  start (onOpenCallback = () => {}) {
+    this.onOpenCallback = onOpenCallback
     this.instance = new SockJS(SOCKET_URL)
     this.instance.onopen = this.onOpen.bind(this)
     this.instance.onclose = this.onClose.bind(this)
@@ -27,6 +32,7 @@ class SocketClient {
     this.send('auth', {
       device: this.key
     })
+    this.onOpenCallback()
   }
 
   onClose () {}

@@ -42,10 +42,6 @@ class Tablet {
     bubblesAnimation()
     window.setInterval(bubblesAnimation, 20000)
   }
-
-  onPastilleTouch (e) {
-    console.log('touch', e, e.dataset)
-  }
 }
 
 export default new Tablet()
