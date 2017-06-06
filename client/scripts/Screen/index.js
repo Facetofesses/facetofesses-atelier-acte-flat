@@ -1,5 +1,6 @@
 import config from '../frontConfig.json'
 import SocketClient from '../utils/SocketClient'
+import ResourceHelper from './ResourceHelper'
 import {
   randomInt
 } from '../utils/index'
@@ -14,7 +15,8 @@ import '../lib/GlitchPass'
 export default class Screen {
   constructor () {
     this.config = config
-    this.loadVideos()
+    ResourceHelper.loadVideos(this.onVideosLoaded.bind(this), config)
+
     this.videoContainer = document.getElementById('video')
     this.partnerTextElement = document.getElementsByClassName('partner-text')[0]
     this.overlayElement = document.getElementsByClassName('overlay')[0]
@@ -26,8 +28,9 @@ export default class Screen {
     this.caressTimeline = null
     this.caressExcitation = 0
 
+    // Rendering
     this.glitch = false
-    this.threejs()
+    this.createThreeScene()
 
     this.state = {
       position: null,
@@ -37,42 +40,51 @@ export default class Screen {
     SocketClient.instance.onmessage = this.onSocketMessage.bind(this)
   }
 
-  threejs () {
+  createThreeScene () {
+    // Create scene
     this.scene = new THREE.Scene()
+
+    // Create camera
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000)
+    this.camera.position.z = 800
+    this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+    this.scene.add(this.camera)
+
+    // Create renderer
     this.renderer = new THREE.WebGLRenderer({
-      antialias : true
+      antialias: true
     })
     this.renderer.setSize(window.innerWidth, window.innerHeight)
 
-    this.texture = new THREE.Texture( this.videoContainer )
+    // Create texture
+    this.texture = new THREE.Texture(this.videoContainer)
     this.texture.needsUpdate = true
     this.texture.minFilter = THREE.LinearFilter
 
+    // Create plane
     const material = new THREE.MeshBasicMaterial({map: this.texture})
     const plane = new THREE.PlaneGeometry(600, 400)
     this.scr = new THREE.Mesh(plane, material)
-
     this.scene.add(this.scr)
-    this.scene.add(this.camera)
-    this.camera.position.z = 800
-    this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+
+    // Add canvas to DOM
     document.getElementsByClassName('screen')[0].appendChild(this.renderer.domElement)
 
+    // Video effects
     this.composer = new THREE.EffectComposer(this.renderer)
     this.rendererPass = new THREE.RenderPass(this.scene, this.camera)
-    this.composer.addPass(this.rendererPass)
     this.glitchPass = new THREE.GlitchPass(64)
     this.glitchPass.goWild = false
     this.glitchPass.renderToScreen = true
+    this.composer.addPass(this.rendererPass)
     this.composer.addPass(this.glitchPass)
 
     this.render()
   }
 
   render () {
-    if ( this.videoContainer.readyState === this.videoContainer.HAVE_ENOUGH_DATA ) {
-      if ( this.texture ) this.texture.needsUpdate = true
+    if (this.videoContainer.readyState === this.videoContainer.HAVE_ENOUGH_DATA) {
+      if (this.texture) this.texture.needsUpdate = true
     }
     if (this.glitch) {
       this.composer.render()
@@ -83,35 +95,9 @@ export default class Screen {
   }
 
   /**
-   * Load all videos
-   */
-  loadVideos () {
-    const promises = []
-    this.config.forEach(c => promises.push(this.loadVideo(c)))
-
-    Promise.all(promises)
-      .then(this.onVideosLoaded.bind(this))
-  }
-
-  /**
-   * Load a video
-   * @param configItem
-   * @returns {Promise.<TResult>}
-   */
-  loadVideo (configItem) {
-    return fetch(configItem.resourceUrl)
-      .then(data => data.blob())
-      .then(data => {
-        configItem.url = URL.createObjectURL(data)
-      })
-  }
-
-  /**
    * Event triggered when all videos are loaded
    */
-  onVideosLoaded () {
-    // this.updateAnimation()
-  }
+  onVideosLoaded () {}
 
   /**
    * Event triggered when screen receive datas from tablet
