@@ -4,6 +4,9 @@ import {
 import SplitText from '../../lib/SplitText'
 import SocketClient from '../../utils/SocketClient'
 
+// touchable arc length before and after an icon
+const ANGLE_DETECTION_INTERVAL = 30
+
 export default class Piece {
   constructor (pieceConfig) {
     this.config = pieceConfig
@@ -45,9 +48,15 @@ export default class Piece {
       y: e.pageY
     }, this.backgroundCenter)
 
-    const selectionIndex = (Math.round(angle * 6 / 360) + 1) % 6
-
-    this.onSelectionChange(selectionIndex)
+    let selectionIndex = 0
+    let iAngle = -360/12
+    let index = 0
+    for (iAngle = -360/12, index = 0; iAngle <= 360 + 360/12; iAngle+=360/6, index++) {
+      if (angle < iAngle + ANGLE_DETECTION_INTERVAL && angle > iAngle - ANGLE_DETECTION_INTERVAL) {
+        selectionIndex = index
+        this.onSelectionChange(selectionIndex)
+      }
+    }
   }
 
   onSelectionChange (selectionIndex) {

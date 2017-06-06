@@ -75,6 +75,7 @@ input {
 
 .screen {
   background-color: #000;
+  overflow: hidden;
 
   img {
     z-index: 1;
@@ -102,7 +103,7 @@ input {
     font-size: 50px;
     line-height: 60px;
     position: absolute;
-    top: 50%;
+    top: 20%;
     left: 50%;
     transform: translate(-50%, -50%) rotate(-3deg);
   }

@@ -6,7 +6,7 @@
     },
     {
       "id": "speed",
-      "selections": ["X1", "X2", "X3", "X4", "X5"]
+      "selections": ["VITESSE X1", "VITESSE X2", "VITESSE X3", "VITESSE X4", "VITESSE X5"]
     },
     {
       "id": "caress",

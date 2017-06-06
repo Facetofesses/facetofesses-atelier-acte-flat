@@ -1,6 +1,6 @@
 import SockJS from 'sockjs-client'
 
-const SOCKET_URL = 'http://192.168.1.56:8090/ws'
+const SOCKET_URL = 'http://192.168.43.9:8090/ws'
 
 class SocketClient {
   constructor () {

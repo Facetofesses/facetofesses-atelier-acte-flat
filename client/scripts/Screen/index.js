@@ -87,7 +87,7 @@ export default class Screen {
       this.positionResponseGaiaTimeoutId = window.setTimeout(() => {
         console.log('gaia: tu devrais changer de position')
       }, 5000)
-    }, randomInt(0, 3000))
+    }, randomInt(10000, 15000))
   }
 
   onSweetWordsChange () {
@@ -134,23 +134,34 @@ export default class Screen {
   }
 
   write (text) {
-    let tl = new TimelineMax()
-
-    if (this.partnerTextElement.innerHTML !== '') {
-      tl.to(this.partnerTextElement, 0.5, {
-        autoAlpha: 0
+    if (this.writeTimeline && this.writeTimeline.isActive()) {
+      this.writeTimeline.pause()
+      TweenMax.to(this.partnerTextElement, 0.3, {
+        autoAlpha: 0,
+        overwrite: 'all'
       })
     }
 
-    tl.call(() => {
-      this.partnerTextElement.innerHTML = text
-    })
-    .to(this.partnerTextElement, 0.5, {
-      autoAlpha: 1
-    })
-    tl.to(this.partnerTextElement, 0.5, {
-      autoAlpha: 0
-    }, '+=4')
+    this.writeTimeline = new TimelineMax()
+      .set(this.partnerTextElement, {
+        autoAlpha: 0,
+        y: 250,
+        xPercent: -50
+      })
+      .call(() => {
+        this.partnerTextElement.innerHTML = text
+      })
+      .add('move', 0)
+      .to(this.partnerTextElement, 0.5, {
+        autoAlpha: 1
+      }, 0)
+      .to(this.partnerTextElement, 0.5, {
+        autoAlpha: 0
+      }, 6.4)
+      .to(this.partnerTextElement, 7, {
+        y: 0,
+        ease: Linear.easeNone
+      }, 0)
       .call(() => {
         this.partnerTextElement.innerHTML = ''
       })
