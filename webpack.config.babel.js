@@ -92,7 +92,8 @@ var clientConfig = Object.assign({}, defaultConfig, {
       'TweenLite': path.resolve('node_modules', 'gsap/src/uncompressed/TweenLite.js'),
       'TweenMax': path.resolve('node_modules', 'gsap/src/uncompressed/TweenMax.js'),
       'TimelineLite': path.resolve('node_modules', 'gsap/src/uncompressed/TimelineLite.js'),
-      'TimelineMax': path.resolve('node_modules', 'gsap/src/uncompressed/TimelineMax.js')
+      'TimelineMax': path.resolve('node_modules', 'gsap/src/uncompressed/TimelineMax.js'),
+      'THREE': path.resolve('node_modules', 'three/build/three.js')
     }
   },
   module: {

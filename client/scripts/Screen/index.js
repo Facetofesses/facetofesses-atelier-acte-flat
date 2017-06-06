@@ -3,6 +3,13 @@ import SocketClient from '../utils/SocketClient'
 import {
   randomInt
 } from '../utils/index'
+import '../lib/CopyShader'
+import '../lib/DigitalGlitch'
+import '../lib/EffectComposer'
+import '../lib/RenderPass'
+import '../lib/MaskPass'
+import '../lib/ShaderPass'
+import '../lib/GlitchPass'
 
 export default class Screen {
   constructor () {
@@ -19,12 +26,60 @@ export default class Screen {
     this.caressTimeline = null
     this.caressExcitation = 0
 
+    this.glitch = false
+    this.threejs()
+
     this.state = {
       position: null,
       speed: 0
     }
 
     SocketClient.instance.onmessage = this.onSocketMessage.bind(this)
+  }
+
+  threejs () {
+    this.scene = new THREE.Scene()
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000)
+    this.renderer = new THREE.WebGLRenderer({
+      antialias : true
+    })
+    this.renderer.setSize(window.innerWidth, window.innerHeight)
+
+    this.texture = new THREE.Texture( this.videoContainer )
+    this.texture.needsUpdate = true
+    this.texture.minFilter = THREE.LinearFilter
+
+    const material = new THREE.MeshBasicMaterial({map: this.texture})
+    const plane = new THREE.PlaneGeometry(600, 400)
+    this.scr = new THREE.Mesh(plane, material)
+
+    this.scene.add(this.scr)
+    this.scene.add(this.camera)
+    this.camera.position.z = 800
+    this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+    document.getElementsByClassName('screen')[0].appendChild(this.renderer.domElement)
+
+    this.composer = new THREE.EffectComposer(this.renderer)
+    this.rendererPass = new THREE.RenderPass(this.scene, this.camera)
+    this.composer.addPass(this.rendererPass)
+    this.glitchPass = new THREE.GlitchPass(64)
+    this.glitchPass.goWild = false
+    this.glitchPass.renderToScreen = true
+    this.composer.addPass(this.glitchPass)
+
+    this.render()
+  }
+
+  render () {
+    if ( this.videoContainer.readyState === this.videoContainer.HAVE_ENOUGH_DATA ) {
+      if ( this.texture ) this.texture.needsUpdate = true
+    }
+    if (this.glitch) {
+      this.composer.render()
+    } else {
+      this.renderer.render(this.scene, this.camera)
+    }
+    requestAnimationFrame(this.render.bind(this))
   }
 
   /**
@@ -55,7 +110,7 @@ export default class Screen {
    * Event triggered when all videos are loaded
    */
   onVideosLoaded () {
-    this.updateAnimation()
+    // this.updateAnimation()
   }
 
   /**
@@ -132,20 +187,22 @@ export default class Screen {
     })
 
     new TimelineMax()
-      .to(this.videoContainer, 0.5, {
-        autoAlpha: 0
-      })
+      .call(() => {
+        this.glitch = true
+        this.glitchPass.goWild = true
+      }, null, null, 0)
       .call(() => {
         if (configItem) {
           this.videoContainer.pause()
           this.videoContainer.src = configItem.url
           this.videoContainer.load()
           this.videoContainer.play()
+          this.videoContainer.addEventListener('playing', () => {
+            this.glitch = false
+            this.glitchPass.goWild = false
+          })
         }
-      })
-      .to(this.videoContainer, 0.5, {
-        autoAlpha: 1
-      })
+      }, null, null, 2)
   }
 
   /**
