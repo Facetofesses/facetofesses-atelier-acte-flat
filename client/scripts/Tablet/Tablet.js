@@ -9,6 +9,7 @@ class Tablet {
   start () {
     PieceManager.start()
     this.initializeElements()
+    this.initializeEvents()
     this.animateBubbles()
   }
 
@@ -16,6 +17,14 @@ class Tablet {
     this.$els = {
       bubbles: selectClass('bubble', true)
     }
+  }
+
+  initializeEvents () {
+    window.setTimeout(() => {
+      window.addEventListener('touchmove', (e) => {
+        e.preventDefault()
+      })
+    }, 1500)
   }
 
   /**
