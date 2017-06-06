@@ -7,8 +7,8 @@ import {
 export default class Screen {
   constructor () {
     this.config = config
-    this.loadGifs()
-    this.animationContainer = document.getElementById('gif')
+    this.loadVideos()
+    this.videoContainer = document.getElementById('video')
     this.partnerTextElement = document.getElementsByClassName('partner-text')[0]
     this.overlayElement = document.getElementsByClassName('overlay')[0]
 
@@ -28,22 +28,22 @@ export default class Screen {
   }
 
   /**
-   * Load all gifs
+   * Load all videos
    */
-  loadGifs () {
+  loadVideos () {
     const promises = []
-    this.config.forEach(c => promises.push(this.loadGif(c)))
+    this.config.forEach(c => promises.push(this.loadVideo(c)))
 
     Promise.all(promises)
-      .then(this.onGifsLoaded.bind(this))
+      .then(this.onVideosLoaded.bind(this))
   }
 
   /**
-   * Load a gif
+   * Load a video
    * @param configItem
    * @returns {Promise.<TResult>}
    */
-  loadGif (configItem) {
+  loadVideo (configItem) {
     return fetch(configItem.resourceUrl)
       .then(data => data.blob())
       .then(data => {
@@ -52,9 +52,9 @@ export default class Screen {
   }
 
   /**
-   * Event triggered when all gifs are loaded
+   * Event triggered when all videos are loaded
    */
-  onGifsLoaded () {
+  onVideosLoaded () {
     this.updateAnimation()
   }
 
@@ -124,7 +124,7 @@ export default class Screen {
   }
 
   /**
-   * Update gif source with new datas (position and speed)
+   * Update video source with new datas (position and speed)
    */
   updateAnimation () {
     const configItem = this.config.find((config) => {
@@ -132,13 +132,18 @@ export default class Screen {
     })
 
     new TimelineMax()
-      .to(this.animationContainer, 0.5, {
+      .to(this.videoContainer, 0.5, {
         autoAlpha: 0
       })
       .call(() => {
-        this.animationContainer.src = (configItem) ? configItem.url : ''
+        if (configItem) {
+          this.videoContainer.pause()
+          this.videoContainer.src = configItem.url
+          this.videoContainer.load()
+          this.videoContainer.play()
+        }
       })
-      .to(this.animationContainer, 0.5, {
+      .to(this.videoContainer, 0.5, {
         autoAlpha: 1
       })
   }

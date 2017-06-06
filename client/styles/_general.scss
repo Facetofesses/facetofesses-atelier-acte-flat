@@ -81,11 +81,12 @@ input {
   background-color: #000;
   overflow: hidden;
 
-  img {
+  video {
     z-index: 1;
     position: absolute;
     top: 50%;
     left: 50%;
+    width: 800px;
     transform: translate(-50%, -50%);
   }
 
