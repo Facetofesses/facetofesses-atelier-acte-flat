@@ -2,7 +2,7 @@ import domReady from 'domready'
 import WebFont from 'webfontloader'
 import 'gsap'
 import Screen from './Screen/index'
-import Graphics from './graphics/index'
+import Tablet from './Tablet/Tablet'
 import SocketClient from './utils/SocketClient'
 import SoundHelper from './utils/SoundHelper'
 import {
@@ -30,7 +30,7 @@ export default class App {
       SocketClient.setKey('tablet')
       SocketClient.start()
       SoundHelper.start()
-      new Graphics()
+      Tablet.start()
     } else {
       selectClass('tablet').style.display = 'none'
       SocketClient.setKey('screen')
