@@ -31,12 +31,12 @@ const defaultConfig = {
         test: /\.js?$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
+      },
+      {
+        test: /\.js$/,
+        loader: 'eslint-loader',
+        exclude: [/node_modules/, /scripts\/lib/]
       }
-      // {
-      //   test: /\.js$/,
-      //   loader: 'eslint-loader',
-      //   exclude: [/node_modules/]
-      // }
     ]
   },
   plugins: [
@@ -54,7 +54,7 @@ const defaultConfig = {
     }),
     new WebpackNotifierPlugin()
   ],
-  devtool: (isProd) ? false : 'eval-cheap-module-source-map',
+  devtool: (isProd) ? false : 'source-map',
   resolve: {
     extensions: ['.js']
   }

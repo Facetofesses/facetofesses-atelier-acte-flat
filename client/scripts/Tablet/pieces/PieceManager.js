@@ -21,5 +21,4 @@ class PieceManager {
   }
 }
 
-
 export default new PieceManager()

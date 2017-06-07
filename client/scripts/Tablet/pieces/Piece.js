@@ -30,14 +30,14 @@ export default class Piece {
    */
   initializeElements () {
     this.$els = {
-      container: selectClass(this.id),
+      container: selectClass(this.id)
     }
 
     this.$els = {
       ...this.$els,
       text: this.$els.container.getElementsByClassName('text')[0],
       upperElement: this.$els.container.getElementsByClassName('upper-element')[0],
-      background: this.$els.container.getElementsByClassName('background')[0],
+      background: this.$els.container.getElementsByClassName('background')[0]
     }
   }
 
@@ -58,12 +58,11 @@ export default class Piece {
       y: e.pageY
     }, this.backgroundCenter)
 
-
     // Get nearest index
     let selectionIndex = 0
-    let iAngle = -360/12
+    let iAngle = -360 / 12
     let index = 0
-    for (iAngle = -360/12, index = 0; iAngle <= 360 + 360/12; iAngle+=360/6, index++) {
+    for (iAngle = -360 / 12, index = 0; iAngle <= 360 + 360 / 12; iAngle += 360 / 6, index++) {
       if (angle < iAngle + ANGLE_DETECTION_INTERVAL && angle > iAngle - ANGLE_DETECTION_INTERVAL) {
         selectionIndex = (index) % 6
         this.onSelectionChange(selectionIndex)
@@ -124,7 +123,7 @@ export default class Piece {
         TweenMax.staggerFromTo(this.currentTextSplit, 0.2, {
           y: 10,
           autoAlpha: 0
-        },  {
+        }, {
           y: 0,
           autoAlpha: 1
         }, 0.05)

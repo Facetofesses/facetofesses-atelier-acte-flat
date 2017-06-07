@@ -69,8 +69,6 @@ export default class VideoRenderer {
     this.scene.add(this.scr)
   }
 
-
-
   addToDOM () {
     document.getElementsByClassName('screen')[0].appendChild(this.renderer.domElement)
   }

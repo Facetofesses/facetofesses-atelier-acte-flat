@@ -202,7 +202,5 @@ export default class Screen {
     } else {
       startWriteTimeline()
     }
-
-
   }
 }
