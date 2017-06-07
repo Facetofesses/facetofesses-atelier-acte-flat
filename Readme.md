@@ -6,17 +6,19 @@
 Clone the projet
 
 ```bash
-git clone git@github.com:quentinneyraud/facetofesses-atelier-acte.git
+git clone git@github.com:quentinneyraud/facetofesses-atelier-acte-flat.git
 ```
 
 Install dependencies (Yarn or npm)
 
 ```bash
-cd facetofesses-atelier-acte
+cd facetofesses-atelier-acte-flat
 yarn
 ```
 
 ## Getting started
+
+Update IP in `client/scripts/utils/SocketClient.js`
 
 ```bash
 npm run dev
