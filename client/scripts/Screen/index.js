@@ -2,24 +2,19 @@ import config from '../frontConfig.json'
 import SocketClient from '../utils/SocketClient'
 import ResourceHelper from './ResourceHelper'
 import {
-  randomInt
+  randomInt,
+  selectClass,
+  selectId
 } from '../utils/index'
-import '../lib/CopyShader'
-import '../lib/DigitalGlitch'
-import '../lib/EffectComposer'
-import '../lib/RenderPass'
-import '../lib/MaskPass'
-import '../lib/ShaderPass'
-import '../lib/GlitchPass'
+import VideoRenderer from './VideoRenderer'
+import Raf from 'raf'
 
 export default class Screen {
   constructor () {
     this.config = config
-    ResourceHelper.loadVideos(this.onVideosLoaded.bind(this), config)
-
-    this.videoContainer = document.getElementById('video')
-    this.partnerTextElement = document.getElementsByClassName('partner-text')[0]
-    this.overlayElement = document.getElementsByClassName('overlay')[0]
+    ResourceHelper.loadVideos(config, this.onVideosLoaded.bind(this))
+    this.initializeElements()
+    this.videoRenderer = new VideoRenderer(this.$els.videoContainer)
 
     // interactions datas
     this.positionResponseTimeoutId = null
@@ -27,10 +22,6 @@ export default class Screen {
     this.responses = ['Je t’aime...', 'Mon amour', 'Hum...c\'est tellement bon']
     this.caressTimeline = null
     this.caressExcitation = 0
-
-    // Rendering
-    this.glitch = false
-    this.createThreeScene()
 
     this.state = {
       position: null,
@@ -40,58 +31,18 @@ export default class Screen {
     SocketClient.instance.onmessage = this.onSocketMessage.bind(this)
   }
 
-  createThreeScene () {
-    // Create scene
-    this.scene = new THREE.Scene()
-
-    // Create camera
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000)
-    this.camera.position.z = 800
-    this.camera.lookAt(new THREE.Vector3(0, 0, 0))
-    this.scene.add(this.camera)
-
-    // Create renderer
-    this.renderer = new THREE.WebGLRenderer({
-      antialias: true
-    })
-    this.renderer.setSize(window.innerWidth, window.innerHeight)
-
-    // Create texture
-    this.texture = new THREE.Texture(this.videoContainer)
-    this.texture.needsUpdate = true
-    this.texture.minFilter = THREE.LinearFilter
-
-    // Create plane
-    const material = new THREE.MeshBasicMaterial({map: this.texture})
-    const plane = new THREE.PlaneGeometry(600, 400)
-    this.scr = new THREE.Mesh(plane, material)
-    this.scene.add(this.scr)
-
-    // Add canvas to DOM
-    document.getElementsByClassName('screen')[0].appendChild(this.renderer.domElement)
-
-    // Video effects
-    this.composer = new THREE.EffectComposer(this.renderer)
-    this.rendererPass = new THREE.RenderPass(this.scene, this.camera)
-    this.glitchPass = new THREE.GlitchPass(64)
-    this.glitchPass.goWild = false
-    this.glitchPass.renderToScreen = true
-    this.composer.addPass(this.rendererPass)
-    this.composer.addPass(this.glitchPass)
-
-    this.render()
+  initializeElements () {
+    this.$els = {
+      videoContainer: selectId('video'),
+      partnerTextElement: selectClass('partner-text'),
+      overlayElement: selectClass('overlay')
+    }
   }
 
   render () {
-    if (this.videoContainer.readyState === this.videoContainer.HAVE_ENOUGH_DATA) {
-      if (this.texture) this.texture.needsUpdate = true
-    }
-    if (this.glitch) {
-      this.composer.render()
-    } else {
-      this.renderer.render(this.scene, this.camera)
-    }
-    requestAnimationFrame(this.render.bind(this))
+    this.videoRenderer.render()
+
+    Raf(this.render.bind(this))
   }
 
   /**
@@ -129,6 +80,8 @@ export default class Screen {
         break
       case 'caress':
         this.onCaress()
+        break
+      default:
         break
     }
   }
@@ -173,20 +126,14 @@ export default class Screen {
     })
 
     new TimelineMax()
-      .call(() => {
-        this.glitch = true
-        this.glitchPass.goWild = true
-      }, null, null, 0)
+      .call(this.videoRenderer.glitch.bind(this.videoRenderer), null, this.videoRenderer, 0)
       .call(() => {
         if (configItem) {
-          this.videoContainer.pause()
-          this.videoContainer.src = configItem.url
-          this.videoContainer.load()
-          this.videoContainer.play()
-          this.videoContainer.addEventListener('playing', () => {
-            this.glitch = false
-            this.glitchPass.goWild = false
-          })
+          this.$els.videoContainer.pause()
+          this.$els.videoContainer.src = configItem.url
+          this.$els.videoContainer.load()
+          this.$els.videoContainer.play()
+          this.$els.videoContainer.addEventListener('playing', this.videoRenderer.unglitch.bind(this.videoRenderer))
         }
       }, null, null, 2)
   }
@@ -199,7 +146,7 @@ export default class Screen {
       this.caressTimeline = new TimelineMax({
         paused: true
       })
-        .fromTo(this.overlayElement, 1, {
+        .fromTo(this.$els.overlayElement, 1, {
           backgroundColor: '#000000'
         }, {
           backgroundColor: '#673101'
@@ -219,36 +166,43 @@ export default class Screen {
    * @param text
    */
   write (text) {
-    if (this.writeTimeline && this.writeTimeline.isActive()) {
-      this.writeTimeline.pause()
-      TweenMax.to(this.partnerTextElement, 0.3, {
-        autoAlpha: 0,
-        overwrite: 'all'
-      })
+    const startWriteTimeline = () => {
+      this.writeTimeline = new TimelineMax()
+        .set(this.$els.partnerTextElement, {
+          autoAlpha: 0,
+          y: 250,
+          xPercent: -50
+        })
+        .call(() => {
+          this.$els.partnerTextElement.innerHTML = text
+        })
+        .add('move', 0)
+        .to(this.$els.partnerTextElement, 0.5, {
+          autoAlpha: 1
+        }, 0)
+        .to(this.$els.partnerTextElement, 0.5, {
+          autoAlpha: 0
+        }, 6.4)
+        .to(this.$els.partnerTextElement, 7, {
+          y: 0,
+          ease: Linear.easeNone
+        }, 0)
+        .call(() => {
+          this.$els.partnerTextElement.innerHTML = ''
+        })
     }
 
-    this.writeTimeline = new TimelineMax()
-      .set(this.partnerTextElement, {
+    if (this.writeTimeline && this.writeTimeline.isActive()) {
+      this.writeTimeline.pause()
+      TweenMax.to(this.$els.partnerTextElement, 0.3, {
         autoAlpha: 0,
-        y: 250,
-        xPercent: -50
+        overwrite: 'all',
+        onComplete: startWriteTimeline
       })
-      .call(() => {
-        this.partnerTextElement.innerHTML = text
-      })
-      .add('move', 0)
-      .to(this.partnerTextElement, 0.5, {
-        autoAlpha: 1
-      }, 0)
-      .to(this.partnerTextElement, 0.5, {
-        autoAlpha: 0
-      }, 6.4)
-      .to(this.partnerTextElement, 7, {
-        y: 0,
-        ease: Linear.easeNone
-      }, 0)
-      .call(() => {
-        this.partnerTextElement.innerHTML = ''
-      })
+    } else {
+      startWriteTimeline()
+    }
+
+
   }
 }

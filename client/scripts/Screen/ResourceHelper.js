@@ -2,7 +2,7 @@ class ResourceHelper {
   /**
    * Load all videos
    */
-  loadVideos (completeCallback, config) {
+  loadVideos (config, completeCallback) {
     const promises = []
     config.forEach(c => promises.push(this.loadVideo(c)))
 
@@ -19,7 +19,7 @@ class ResourceHelper {
     return fetch(configItem.resourceUrl)
       .then(data => data.blob())
       .then(data => {
-        configItem.url = URL.createObjectURL(data)
+        configItem.url = window.URL.createObjectURL(data)
       })
   }
 }
