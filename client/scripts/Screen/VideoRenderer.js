@@ -26,7 +26,7 @@ export default class VideoRenderer {
 
   createCamera () {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000)
-    this.camera.position.z = 500
+    this.camera.position.z = 400
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
     this.scene.add(this.camera)
   }
