@@ -46,6 +46,7 @@ export default class Piece {
    */
   initializeEvents () {
     this.$els.background.addEventListener('touchstart', this.onBackgroundTouch.bind(this))
+    this.$els.background.addEventListener('click', this.onBackgroundTouch.bind(this))
   }
 
   /**

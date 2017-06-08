@@ -29,6 +29,8 @@ export default class Screen {
     }
 
     SocketClient.instance.onmessage = this.onSocketMessage.bind(this)
+    this.render()
+    this.videoRenderer.startCircleWave()
   }
 
   initializeElements () {
@@ -58,7 +60,7 @@ export default class Screen {
     const datas = JSON.parse(e.data)
     this.updateState(datas.id, datas.selection)
     if (datas.id === 'position' || datas.id === 'speed') {
-      this.updateAnimation()
+      this.updateAnimation(datas.id === 'speed')
     }
   }
 
@@ -120,10 +122,12 @@ export default class Screen {
   /**
    * Update video source with new datas (position and speed)
    */
-  updateAnimation () {
+  updateAnimation (isSpeed) {
     const configItem = this.config.find((config) => {
       return config.position === this.state.position && config.speed === this.state.speed
     })
+
+    const glitchTime = (isSpeed) ? 0.3 : 1.5
 
     new TimelineMax()
       .call(this.videoRenderer.glitch.bind(this.videoRenderer), null, this.videoRenderer, 0)
@@ -133,9 +137,11 @@ export default class Screen {
           this.$els.videoContainer.src = configItem.url
           this.$els.videoContainer.load()
           this.$els.videoContainer.play()
-          this.$els.videoContainer.addEventListener('playing', this.videoRenderer.unglitch.bind(this.videoRenderer))
         }
-      }, null, null, 2)
+      })
+      .call(() => {
+        this.videoRenderer.unglitch()
+      }, null, null, glitchTime)
   }
 
   /**
