@@ -12,7 +12,7 @@ import Raf from 'raf'
 export default class Screen {
   constructor () {
     this.config = config
-    ResourceHelper.loadVideos(config, this.onVideosLoaded.bind(this))
+    ResourceHelper.loadVideos(config)
     this.initializeElements()
     this.videoRenderer = new VideoRenderer(this.$els.videoContainer)
 
@@ -29,8 +29,8 @@ export default class Screen {
     }
 
     SocketClient.instance.onmessage = this.onSocketMessage.bind(this)
+    this.renderVideoElement()
     this.render()
-    this.videoRenderer.startCircleWave()
   }
 
   initializeElements () {
@@ -39,18 +39,27 @@ export default class Screen {
       partnerTextElement: selectClass('partner-text'),
       overlayElement: selectClass('overlay')
     }
+
+    document.getElementsByTagName('button')[0].addEventListener('click', () => {
+      this.$els.videoContainer.load()
+      this.$els.videoContainer.play()
+      document.getElementsByTagName('button')[0].style.display = 'none'
+    })
+
+    window.setTimeout(() => {
+      window.addEventListener('touchmove', (e) => {
+        e.preventDefault()
+      })
+    }, 1500)
   }
 
   render () {
-    this.videoRenderer.render()
+    if (this.useThreeJsRenderer) {
+      this.videoRenderer.render()
+    }
 
     Raf(this.render.bind(this))
   }
-
-  /**
-   * Event triggered when all videos are loaded
-   */
-  onVideosLoaded () {}
 
   /**
    * Event triggered when screen receive datas from tablet
@@ -60,7 +69,11 @@ export default class Screen {
     const datas = JSON.parse(e.data)
     this.updateState(datas.id, datas.selection)
     if (datas.id === 'position' || datas.id === 'speed') {
-      this.updateAnimation(datas.id === 'speed')
+      const animation = this.getAnimation()
+
+      if (animation) {
+        this.updateAnimation(animation, datas.id === 'speed')
+      }
     }
   }
 
@@ -119,52 +132,41 @@ export default class Screen {
     }, 1500)
   }
 
+  getAnimation () {
+    return this.config.find((config) => {
+      return config.position === this.state.position && config.speed === this.state.speed
+    })
+  }
+
   /**
    * Update video source with new datas (position and speed)
    */
-  updateAnimation (isSpeed) {
-    const configItem = this.config.find((config) => {
-      return config.position === this.state.position && config.speed === this.state.speed
-    })
+  updateAnimation (animation, isSpeed) {
+    const glitchTime = (isSpeed) ? 0.6 : 1
 
-    const glitchTime = (isSpeed) ? 0.3 : 1.5
+    this.renderThreeJs()
+    window.setTimeout(() => {
+      this.videoRenderer.glitch()
 
-    new TimelineMax()
-      .call(this.videoRenderer.glitch.bind(this.videoRenderer), null, this.videoRenderer, 0)
-      .call(() => {
-        if (configItem) {
-          this.$els.videoContainer.pause()
-          this.$els.videoContainer.src = configItem.url
-          this.$els.videoContainer.load()
-          this.$els.videoContainer.play()
-        }
-      })
-      .call(() => {
-        this.videoRenderer.unglitch()
-      }, null, null, glitchTime)
+      this.$els.videoContainer.src = animation.resourceUrl
+      this.$els.videoContainer.load()
+      this.$els.videoContainer.play()
+
+      this.$els.videoContainer.onplay = () => {
+        this.$els.videoContainer.onplay = null
+        new TimelineMax()
+          .call(this.videoRenderer.unglitch.bind(this.videoRenderer), null, this.videoRenderer, glitchTime)
+          .call(this.renderVideoElement.bind(this), null, this)
+      }
+    }, 50)
   }
 
   /**
    * Called when caress has been sended
    */
   onCaress () {
-    if (!this.caressTimeline) {
-      this.caressTimeline = new TimelineMax({
-        paused: true
-      })
-        .fromTo(this.$els.overlayElement, 1, {
-          backgroundColor: '#000000'
-        }, {
-          backgroundColor: '#673101'
-        })
-    }
-
-    this.caressExcitation += 0.01
-    if (this.caressExcitation > 1) {
-      this.caressExcitation = 1
-    }
-
-    this.caressTimeline.seek(this.caressExcitation)
+    this.renderThreeJs()
+    this.videoRenderer.startCircleWave(this.renderVideoElement.bind(this))
   }
 
   /**
@@ -208,5 +210,16 @@ export default class Screen {
     } else {
       startWriteTimeline()
     }
+  }
+
+  renderThreeJs () {
+    this.useThreeJsRenderer = true
+    this.$els.videoContainer.style.display = 'none'
+  }
+
+  renderVideoElement () {
+    this.videoRenderer.renderer.clear()
+    this.useThreeJsRenderer = false
+    this.$els.videoContainer.style.display = 'block'
   }
 }

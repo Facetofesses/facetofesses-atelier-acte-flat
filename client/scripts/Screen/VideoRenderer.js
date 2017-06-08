@@ -26,7 +26,7 @@ export default class VideoRenderer {
 
   createCamera () {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000)
-    this.camera.position.z = 800
+    this.camera.position.z = 500
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
     this.scene.add(this.camera)
   }
@@ -36,6 +36,7 @@ export default class VideoRenderer {
       antialias: true
     })
     this.renderer.setSize(window.innerWidth, window.innerHeight)
+    this.renderer.setPixelRatio(window.devicePixelRatio)
   }
 
   createScene () {
@@ -52,7 +53,7 @@ export default class VideoRenderer {
     this.glitchPass.goWild = false
   }
 
-  startCircleWave () {
+  startCircleWave (completeCallback) {
     this.circles = []
     for (let i = 0; i < 5; i++) {
       const circle = this.createCircle()
@@ -62,7 +63,8 @@ export default class VideoRenderer {
       TweenMax.to(circle.scale, 2, {
         x: `+=${radius}`,
         y: `+=${radius}`,
-        ease: Power1.easeIn
+        ease: Power1.easeIn,
+        onComplete: completeCallback
       })
       TweenMax.to(circle.material, 2, {
         opacity: 0,
@@ -89,7 +91,7 @@ export default class VideoRenderer {
   addEffects () {
     this.composer = new THREE.EffectComposer(this.renderer)
     this.rendererPass = new THREE.RenderPass(this.scene, this.camera)
-    this.glitchPass = new THREE.GlitchPass(64)
+    this.glitchPass = new THREE.GlitchPass(128)
     this.glitchPass.goWild = false
     this.glitchPass.renderToScreen = true
     this.composer.addPass(this.rendererPass)
@@ -97,12 +99,12 @@ export default class VideoRenderer {
   }
 
   createCameraPlane () {
-    this.texture = new THREE.Texture(this.videoDomElement)
-    this.texture.needsUpdate = true
+    this.texture = new THREE.VideoTexture(this.videoDomElement)
     this.texture.minFilter = THREE.LinearFilter
+    this.texture.magFilter = THREE.LinearFilter
 
     const material = new THREE.MeshBasicMaterial({map: this.texture})
-    const plane = new THREE.PlaneGeometry(850, 480)
+    const plane = new THREE.PlaneBufferGeometry(425, 240)
     this.scr = new THREE.Mesh(plane, material)
     this.scene.add(this.scr)
   }
@@ -112,9 +114,7 @@ export default class VideoRenderer {
   }
 
   render () {
-    if (this.videoDomElement.readyState === this.videoDomElement.HAVE_ENOUGH_DATA) {
-      if (this.texture) this.texture.needsUpdate = true
-    }
+    if (!this.videoDomElement.HAVE_ENOUGH_DATA) return
     if (this.glitchEnabled) {
       this.composer.render()
     } else {

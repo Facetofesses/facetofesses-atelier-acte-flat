@@ -2,12 +2,11 @@ class ResourceHelper {
   /**
    * Load all videos
    */
-  loadVideos (config, completeCallback) {
+  loadVideos (config) {
     const promises = []
     config.forEach(c => promises.push(this.loadVideo(c)))
 
     Promise.all(promises)
-      .then(completeCallback)
   }
 
   /**

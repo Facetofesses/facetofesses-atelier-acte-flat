@@ -3,6 +3,7 @@ import {
 } from '../../utils/index'
 import SplitText from '../../lib/SplitText'
 import SocketClient from '../../utils/SocketClient'
+import SoundHelper from '../../utils/SoundHelper'
 
 // touchable arc length before and after an icon
 const ANGLE_DETECTION_INTERVAL = 30
@@ -58,6 +59,8 @@ export default class Piece {
       x: e.pageX,
       y: e.pageY
     }, this.backgroundCenter)
+
+    SoundHelper.play('on_selection')
 
     // Get nearest index
     let selectionIndex = 0

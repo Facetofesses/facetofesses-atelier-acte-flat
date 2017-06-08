@@ -4,6 +4,7 @@ import 'gsap'
 import Screen from './Screen/index'
 import Tablet from './Tablet/Tablet'
 import SocketClient from './utils/SocketClient'
+import SoundHelper from './utils/SoundHelper'
 import {
   isMobile,
   selectClass
@@ -27,9 +28,10 @@ export default class App {
   start () {
     dbg('start')
     /* eslint no-new:0 */
-    if (isMobile()) {
+    if (!isMobile()) {
       selectClass('tablet').style.display = 'block'
       SocketClient.setKey('tablet')
+      SoundHelper.start()
       SocketClient.start(Tablet.start.bind(Tablet))
     } else {
       selectClass('screen').style.display = 'block'
