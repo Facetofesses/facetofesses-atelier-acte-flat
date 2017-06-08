@@ -29,7 +29,6 @@ class SocketClient {
    * send socket message of type 'auth' to identify device on server
    */
   onOpen () {
-    console.log('socket open')
     this.send('auth', {
       device: this.key
     })

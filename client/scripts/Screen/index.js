@@ -40,11 +40,11 @@ export default class Screen {
       overlayElement: selectClass('overlay')
     }
 
-    document.getElementsByTagName('button')[0].addEventListener('click', () => {
-      this.$els.videoContainer.load()
-      this.$els.videoContainer.play()
-      document.getElementsByTagName('button')[0].style.display = 'none'
-    })
+    // document.getElementsByTagName('button')[0].addEventListener('click', () => {
+    //   this.$els.videoContainer.load()
+    //   this.$els.videoContainer.play()
+    //   document.getElementsByTagName('button')[0].style.display = 'none'
+    // })
 
     window.setTimeout(() => {
       window.addEventListener('touchmove', (e) => {
@@ -165,8 +165,7 @@ export default class Screen {
    * Called when caress has been sended
    */
   onCaress () {
-    this.renderThreeJs()
-    this.videoRenderer.startCircleWave(this.renderVideoElement.bind(this))
+
   }
 
   /**
