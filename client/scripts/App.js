@@ -39,6 +39,7 @@ export default class App {
           window.setTimeout(() => {
             SoundHelper.multiPlayer.startLoop('ambient_sound')
             SoundHelper.multiPlayer.startLoop('pulse_sound')
+            SoundHelper.getActiveSound('pulse_sound').playbackRate.rampTo(0.5, 0)
             tablet.listenPiecesInteractions()
           }, SoundHelper.getActiveSound('intro_sound').buffer.duration * 1000)
         })

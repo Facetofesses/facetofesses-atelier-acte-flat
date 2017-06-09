@@ -9,8 +9,9 @@ import SoundHelper from '../../utils/SoundHelper'
 const ANGLE_DETECTION_INTERVAL = 30
 
 export default class Piece {
-  constructor (pieceConfig) {
+  constructor (pieceConfig, onSelectionChangeParent) {
     this.config = pieceConfig
+    this.onSelectionChangeParent = onSelectionChangeParent
     this.id = this.config.id
     this.currentTextSplit = null
     this.lastSelectionIndex = 5
@@ -80,8 +81,10 @@ export default class Piece {
   onSelectionChange (selectionIndex) {
     if (selectionIndex === this.lastSelectionIndex) return
 
+    this.onSelectionChangeParent(this.id, selectionIndex)
+
     // show new text
-    this.animateText(this.config.selections[selectionIndex] || '')
+    this.animateText(this.config.selections[selectionIndex])
 
     // upper element rotation
     TweenMax.to(this.$els.upperElement, 0.5, {

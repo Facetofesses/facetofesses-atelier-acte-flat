@@ -32,16 +32,6 @@ class SoundHelper {
   }
 
   /**
-   * Event called when all sounds are loaded
-   */
-  loadHandler () {
-    window.setTimeout(() => {
-      this.multiPlayer.startLoop('ambient_sound')
-      this.multiPlayer.startLoop('pulse_sound')
-    }, this.getActiveSound('intro_sound').buffer.duration * 1000)
-  }
-
-  /**
    * Start to play a sound
    * @param key
    */

@@ -2,19 +2,19 @@
   "pieces": [
     {
       "id": "position",
-      "selections": ["L'AMAZONE", "LE MISSIONNAIRE", "LA CUILLERE", "L'AMAZONE", "L'OEUF"]
+      "selections": ["L'AMAZONE", "LE MISSIONNAIRE", "LA CUILLERE", "L'AMAZONE", "L'OEUF", "..."]
     },
     {
       "id": "speed",
-      "selections": ["VITESSE X1", "VITESSE X2", "VITESSE X3", "VITESSE X4", "VITESSE X5"]
+      "selections": ["VITESSE X1", "VITESSE X2", "VITESSE X3", "VITESSE X4", "VITESSE X5", "..."]
     },
     {
       "id": "caress",
-      "selections": ["joue", "torse", "cou", "oreille", "dos"]
+      "selections": ["joue", "torse", "cou", "oreille", "dos", "..."]
     },
     {
       "id": "sweet-words",
-      "selections": ["Hum...c'est tellement bon", "T'es doux", "Mon amour", "Moi aussi je t'aime", "A voir"]
+      "selections": ["Hum...c'est tellement bon", "T'es doux", "Mon amour", "Moi aussi je t'aime", "A voir", "..."]
     }
   ]
 }

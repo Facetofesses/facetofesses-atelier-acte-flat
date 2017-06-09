@@ -66,17 +66,18 @@ export default class Screen {
   onSocketMessage (datas) {
     if (firstInteraction) {
       this.clearResponseTimeout('gaia_caress_help')
-      this.setResponseTimeout('gaia_caress_help', randomInt(8000, 15000), () => {
+      this.setResponseTimeout('gaia_caress_help', 7000, () => {
         SocketClient.send('sound', {
           sound: 'caress_help_sound'
         })
       })
       this.clearResponseTimeout('gaia_sweet_words_help')
-      this.setResponseTimeout('gaia_sweet_words_help', randomInt(8000, 15000), () => {
+      this.setResponseTimeout('gaia_sweet_words_help', 17000, () => {
         SocketClient.send('sound', {
           sound: 'sweet_words_help_sound'
         })
       })
+      firstInteraction = false
     }
 
     this.updateState(datas.id, datas.selection)
@@ -121,7 +122,7 @@ export default class Screen {
     this.clearResponseTimeout('position_change')
     this.clearResponseTimeout('gaia_position_help')
 
-    this.setResponseTimeout('position_change', randomInt(10000, 15000), () => {
+    this.setResponseTimeout('position_change', 25000, () => {
       this.write('Pfiou, je commence<br> à fatiguer...')
       this.setResponseTimeout('gaia_position_help', 5000, () => {
         SocketClient.send('sound', {
@@ -136,11 +137,6 @@ export default class Screen {
    */
   onSweetWordsChange () {
     this.clearResponseTimeout('gaia_sweet_words_help')
-    this.setResponseTimeout('gaia_sweet_words_help', randomInt(8000, 15000), () => {
-      SocketClient.send('sound', {
-        sound: 'sweet_words_help_sound'
-      })
-    })
     window.setTimeout(() => {
       this.write(this.responses[randomInt(0, this.responses.length - 1)])
     }, 1500)
@@ -180,11 +176,6 @@ export default class Screen {
    */
   onCaress () {
     this.clearResponseTimeout('gaia_caress_help')
-    this.setResponseTimeout('gaia_caress_help', randomInt(8000, 15000), () => {
-      SocketClient.send('sound', {
-        sound: 'caress_help_sound'
-      })
-    })
   }
 
   /**
