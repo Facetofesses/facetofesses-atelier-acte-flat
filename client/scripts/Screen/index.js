@@ -71,6 +71,12 @@ export default class Screen {
           sound: 'caress_help_sound'
         })
       })
+      this.clearResponseTimeout('gaia_sweet_words_help')
+      this.setResponseTimeout('gaia_sweet_words_help', randomInt(8000, 15000), () => {
+        SocketClient.send('sound', {
+          sound: 'sweet_words_help_sound'
+        })
+      })
     }
 
     this.updateState(datas.id, datas.selection)
@@ -112,10 +118,10 @@ export default class Screen {
    */
   onPositionChange () {
     // clear timeouts
-    this.clearResponseTimeout('positionChange')
+    this.clearResponseTimeout('position_change')
     this.clearResponseTimeout('gaia_position_help')
 
-    this.setResponseTimeout('positionChange', randomInt(10000, 15000), () => {
+    this.setResponseTimeout('position_change', randomInt(10000, 15000), () => {
       this.write('Pfiou, je commence<br> à fatiguer...')
       this.setResponseTimeout('gaia_position_help', 5000, () => {
         SocketClient.send('sound', {
@@ -129,6 +135,12 @@ export default class Screen {
    * Called when sweet words have been sended
    */
   onSweetWordsChange () {
+    this.clearResponseTimeout('gaia_sweet_words_help')
+    this.setResponseTimeout('gaia_sweet_words_help', randomInt(8000, 15000), () => {
+      SocketClient.send('sound', {
+        sound: 'sweet_words_help_sound'
+      })
+    })
     window.setTimeout(() => {
       this.write(this.responses[randomInt(0, this.responses.length - 1)])
     }, 1500)
@@ -167,6 +179,7 @@ export default class Screen {
    * Called when caress has been sended
    */
   onCaress () {
+    this.clearResponseTimeout('gaia_caress_help')
     this.setResponseTimeout('gaia_caress_help', randomInt(8000, 15000), () => {
       SocketClient.send('sound', {
         sound: 'caress_help_sound'

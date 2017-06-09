@@ -47,7 +47,6 @@ class SocketClient {
 
   onMessage (e) {
     const datas = JSON.parse(e.data)
-    console.log('receive', datas)
     this.onMessageCallbacks.forEach(cb => cb(datas))
   }
 
@@ -62,7 +61,6 @@ class SocketClient {
    */
   send (type, datas) {
     const msg = Object.assign({}, datas, {type})
-    console.log('send', msg)
     this.instance.send(JSON.stringify(msg))
   }
 }

@@ -49,6 +49,7 @@ class SocketDispatcher {
       const tablet = this.getDevice('tablet')
 
       if (screen && tablet) {
+        console.log('bind')
         screen.onSocketDatasReceived = (datas) => {
           tablet.emit(datas.type, datas)
         }
