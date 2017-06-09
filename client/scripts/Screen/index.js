@@ -10,6 +10,8 @@ import Raf from 'raf'
 
 let firstInteraction = true
 
+const DEMO_TIME = 60
+
 export default class Screen {
   constructor () {
     this.config = config
@@ -71,18 +73,29 @@ export default class Screen {
    */
   onSocketMessage (datas) {
     if (firstInteraction) {
+      // Add caress timeout
       this.clearResponseTimeout('gaia_caress_help')
       this.setResponseTimeout('gaia_caress_help', 7000, () => {
         SocketClient.send('sound', {
           sound: 'caress_help_sound'
         })
       })
+
+      // Add sweet words timeout
       this.clearResponseTimeout('gaia_sweet_words_help')
       this.setResponseTimeout('gaia_sweet_words_help', 17000, () => {
         SocketClient.send('sound', {
           sound: 'sweet_words_help_sound'
         })
       })
+
+      // end of demo timeout
+      window.setTimeout(() => {
+        SocketClient.send('sound', {
+          sound: 'end_sound',
+          action: 'stop_all'
+        })
+      }, DEMO_TIME * 1000)
       firstInteraction = false
     }
 

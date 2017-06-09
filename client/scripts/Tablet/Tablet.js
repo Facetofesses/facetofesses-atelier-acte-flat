@@ -82,6 +82,10 @@ export default class Tablet {
   onSocketMessage (datas) {
     if (datas.type === 'sound') {
       SoundHelper.play(datas.sound)
+
+      if (datas.action && datas.action === 'stop_all') {
+        // stop all (sound)
+      }
     }
   }
 }
