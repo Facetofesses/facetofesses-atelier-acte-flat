@@ -27,18 +27,28 @@ export default class App {
    */
   start () {
     dbg('start')
-    /* eslint no-new:0 */
     if (!isMobile()) {
       selectClass('tablet').style.display = 'block'
+      let tablet = new Tablet()
       SocketClient.setKey('tablet')
-      SoundHelper.start()
-      SocketClient.start(Tablet.start.bind(Tablet))
+
+      Promise.all([SocketClient.start(), SoundHelper.start()])
+        .then(() => {
+          SoundHelper.play('intro_sound')
+
+          window.setTimeout(() => {
+            SoundHelper.multiPlayer.startLoop('ambient_sound')
+            SoundHelper.multiPlayer.startLoop('pulse_sound')
+            tablet.listenPiecesInteractions()
+          }, SoundHelper.getActiveSound('intro_sound').buffer.duration * 1000)
+        })
     } else {
       selectClass('screen').style.display = 'block'
       SocketClient.setKey('screen')
-      SocketClient.start(() => {
-        new Screen()
-      })
+      SocketClient.start()
+        .then(() => {
+          new Screen()
+        })
     }
   }
 

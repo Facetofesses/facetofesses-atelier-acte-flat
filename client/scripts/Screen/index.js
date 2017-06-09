@@ -1,6 +1,5 @@
 import config from '../frontConfig.json'
 import SocketClient from '../utils/SocketClient'
-import ResourceHelper from './ResourceHelper'
 import {
   randomInt,
   selectClass,
@@ -9,26 +8,25 @@ import {
 import VideoRenderer from './VideoRenderer'
 import Raf from 'raf'
 
+let firstInteraction = true
+
 export default class Screen {
   constructor () {
     this.config = config
-    ResourceHelper.loadVideos(config)
     this.initializeElements()
     this.videoRenderer = new VideoRenderer(this.$els.videoContainer)
 
     // interactions datas
-    this.positionResponseTimeoutId = null
-    this.positionResponseGaiaTimeoutId = null
+    this.timeoutIds = []
     this.responses = ['Je t’aime...', 'Mon amour', 'Hum...c\'est tellement bon']
     this.caressTimeline = null
-    this.caressExcitation = 0
 
     this.state = {
       position: null,
       speed: 0
     }
 
-    SocketClient.instance.onmessage = this.onSocketMessage.bind(this)
+    SocketClient.addOnMessageListener(this.onSocketMessage.bind(this))
     this.renderVideoElement()
     this.render()
   }
@@ -65,8 +63,16 @@ export default class Screen {
    * Event triggered when screen receive datas from tablet
    * @param e
    */
-  onSocketMessage (e) {
-    const datas = JSON.parse(e.data)
+  onSocketMessage (datas) {
+    if (firstInteraction) {
+      this.clearResponseTimeout('gaia_caress_help')
+      this.setResponseTimeout('gaia_caress_help', randomInt(8000, 15000), () => {
+        SocketClient.send('sound', {
+          sound: 'caress_help_sound'
+        })
+      })
+    }
+
     this.updateState(datas.id, datas.selection)
     if (datas.id === 'position' || datas.id === 'speed') {
       const animation = this.getAnimation()
@@ -106,21 +112,17 @@ export default class Screen {
    */
   onPositionChange () {
     // clear timeouts
-    if (this.positionResponseTimeoutId) {
-      clearTimeout(this.positionResponseTimeoutId)
-      this.positionResponseTimeoutId = null
-    }
-    if (this.positionResponseGaiaTimeoutId) {
-      clearTimeout(this.positionResponseGaiaTimeoutId)
-      this.positionResponseGaiaTimeoutId = null
-    }
+    this.clearResponseTimeout('positionChange')
+    this.clearResponseTimeout('gaia_position_help')
 
-    this.positionResponseTimeoutId = window.setTimeout(() => {
+    this.setResponseTimeout('positionChange', randomInt(10000, 15000), () => {
       this.write('Pfiou, je commence<br> à fatiguer...')
-      this.positionResponseGaiaTimeoutId = window.setTimeout(() => {
-        console.log('gaia: tu devrais changer de position')
-      }, 5000)
-    }, randomInt(10000, 15000))
+      this.setResponseTimeout('gaia_position_help', 5000, () => {
+        SocketClient.send('sound', {
+          sound: 'position_help_sound'
+        })
+      })
+    })
   }
 
   /**
@@ -165,7 +167,11 @@ export default class Screen {
    * Called when caress has been sended
    */
   onCaress () {
-
+    this.setResponseTimeout('gaia_caress_help', randomInt(8000, 15000), () => {
+      SocketClient.send('sound', {
+        sound: 'caress_help_sound'
+      })
+    })
   }
 
   /**
@@ -220,5 +226,16 @@ export default class Screen {
     this.videoRenderer.renderer.clear()
     this.useThreeJsRenderer = false
     this.$els.videoContainer.style.display = 'block'
+  }
+
+  setResponseTimeout (timeoutIdKey, delay, callback) {
+    this.timeoutIds[timeoutIdKey] = window.setTimeout(callback, delay)
+  }
+
+  clearResponseTimeout (timeoutIdKey) {
+    if (this.timeoutIds[timeoutIdKey]) {
+      clearTimeout(this.timeoutIds[timeoutIdKey])
+      this.timeoutIds[timeoutIdKey] = null
+    }
   }
 }

@@ -1,7 +1,16 @@
 export default class SocketListener {
+  constructor () {
+    this.device = null
+    this.socket = null
+  }
+
   setSocket (socket) {
     this.socket = socket
     this.listen()
+  }
+
+  setDevice (device) {
+    this.device = device
   }
 
   listen () {

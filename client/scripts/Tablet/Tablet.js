@@ -4,13 +4,16 @@ import {
   randomInt,
   randomFloat
 } from '../utils/index'
+import SocketClient from '../utils/SocketClient'
+import SoundHelper from '../utils/SoundHelper'
 
-class Tablet {
-  start () {
-    PieceManager.start()
+export default class Tablet {
+  constructor () {
+    this.pieceManager = new PieceManager()
     this.initializeElements()
-    this.initializeEvents()
     this.animateBubbles()
+
+    SocketClient.addOnMessageListener(this.onSocketMessage.bind(this))
   }
 
   initializeElements () {
@@ -25,6 +28,14 @@ class Tablet {
         e.preventDefault()
       })
     }, 1500)
+  }
+
+  listenPiecesInteractions () {
+    for (let key in this.pieceManager.pieces) {
+      if (this.pieceManager.pieces.hasOwnProperty(key)) {
+        this.pieceManager.pieces[key].initializeEvents()
+      }
+    }
   }
 
   /**
@@ -54,6 +65,10 @@ class Tablet {
     bubblesAnimation()
     window.setInterval(bubblesAnimation, 20000)
   }
-}
 
-export default new Tablet()
+  onSocketMessage (datas) {
+    if (datas.type === 'sound') {
+      SoundHelper.play(datas.sound)
+    }
+  }
+}

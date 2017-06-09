@@ -16,7 +16,6 @@ export default class Piece {
     this.lastSelectionIndex = 5
 
     this.initializeElements()
-    this.initializeEvents()
 
     // Set reusable values
     const bounding = this.$els.background.getBoundingClientRect()
@@ -60,7 +59,7 @@ export default class Piece {
       y: e.pageY
     }, this.backgroundCenter)
 
-    SoundHelper.play('on_selection')
+    SoundHelper.play('selection_sound')
 
     // Get nearest index
     let selectionIndex = 0
@@ -79,26 +78,26 @@ export default class Piece {
    * @param selectionIndex
    */
   onSelectionChange (selectionIndex) {
-    if (selectionIndex !== this.lastSelectionIndex) {
-      // show new text
-      this.animateText(this.config.selections[selectionIndex] || '')
+    if (selectionIndex === this.lastSelectionIndex) return
 
-      // upper element rotation
-      TweenMax.to(this.$els.upperElement, 0.3, {
-        rotation: 60 + selectionIndex * 60
+    // show new text
+    this.animateText(this.config.selections[selectionIndex] || '')
+
+    // upper element rotation
+    TweenMax.to(this.$els.upperElement, 0.5, {
+      rotation: 60 + selectionIndex * 60,
+      ease: Power2.easeInOut
+    })
+
+    // send info to screen
+    if (this.config.selections[selectionIndex]) {
+      SocketClient.send('datas', {
+        id: this.id,
+        selection: selectionIndex
       })
-
-      // send info to screen
-      if (this.config.selections[selectionIndex]) {
-        SocketClient.send('datas', {
-          id: this.id,
-          selection: selectionIndex,
-          text: this.config.selections[selectionIndex] || ''
-        })
-      }
-
-      this.lastSelectionIndex = selectionIndex
     }
+
+    this.lastSelectionIndex = selectionIndex
   }
 
   /**
@@ -130,7 +129,7 @@ export default class Piece {
         }, {
           y: 0,
           autoAlpha: 1
-        }, 0.05)
+        }, 0.03)
       } else {
         this.currentTextSplit = null
       }
@@ -140,7 +139,7 @@ export default class Piece {
       TweenMax.staggerTo(this.currentTextSplit, 0.2, {
         y: -10,
         autoAlpha: 0
-      }, 0.05, showNew)
+      }, 0.03, showNew)
     } else {
       showNew()
     }

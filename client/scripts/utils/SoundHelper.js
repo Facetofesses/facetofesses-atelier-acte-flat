@@ -6,24 +6,39 @@ class SoundHelper {
    */
   start () {
     this.sounds = {
-      on_selection: '/static/selection_sound.mp3',
-      ambient_sound: '/static/ambient_sound.mp3'
+      ambient_sound: '/static/sounds/ambient_sound.mp3',
+      caress_help_sound: '/static/sounds/caress_help_sound.mp3',
+      end_sound: '/static/sounds/end_sound.mp3',
+      intro_sound: '/static/sounds/intro_sound.mp3',
+      position_help_sound: '/static/sounds/position_help_sound.mp3',
+      pulse_sound: '/static/sounds/pulse_sound.mp3',
+      selection_sound: '/static/sounds/selection_sound.mp3',
+      sweet_words_help_sound: '/static/sounds/sweet_words_help_sound.mp3'
     }
-    this.loadSounds()
+    return this.loadSounds()
   }
 
   /**
    * Load all sounds needed in app
    */
   loadSounds () {
-    this.multiPlayer = new Tone.MultiPlayer(this.sounds, this.loadHandler.bind(this)).toMaster()
+    return new Promise((resolve, reject) => {
+      this.multiPlayer = new Tone.MultiPlayer(this.sounds, resolve).toMaster()
+    })
+  }
+
+  getActiveSound (key) {
+    return this.multiPlayer._activeSources[key][0]
   }
 
   /**
    * Event called when all sounds are loaded
    */
   loadHandler () {
-    this.multiPlayer.startLoop('ambient_sound')
+    window.setTimeout(() => {
+      this.multiPlayer.startLoop('ambient_sound')
+      this.multiPlayer.startLoop('pulse_sound')
+    }, this.getActiveSound('intro_sound').buffer.duration * 1000)
   }
 
   /**

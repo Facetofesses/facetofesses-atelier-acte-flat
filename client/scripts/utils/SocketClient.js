@@ -6,6 +6,7 @@ const SOCKET_URL = `http://${IP}:8090/ws`
 class SocketClient {
   constructor () {
     this.onOpenCallback = null
+    this.onMessageCallbacks = []
   }
 
   /**
@@ -19,10 +20,17 @@ class SocketClient {
    * Connect to socket server
    */
   start (onOpenCallback = () => {}) {
-    this.onOpenCallback = onOpenCallback
-    this.instance = new SockJS(SOCKET_URL)
-    this.instance.onopen = this.onOpen.bind(this)
-    this.instance.onclose = this.onClose.bind(this)
+    return new Promise((resolve, reject) => {
+      this.onOpenCallback = onOpenCallback
+      this.instance = new SockJS(SOCKET_URL)
+      this.instance.onclose = this.onClose.bind(this)
+      this.instance.onmessage = this.onMessage.bind(this)
+
+      this.instance.onopen = () => {
+        this.onOpen()
+        resolve()
+      }
+    })
   }
 
   /**
@@ -37,6 +45,16 @@ class SocketClient {
 
   onClose () {}
 
+  onMessage (e) {
+    const datas = JSON.parse(e.data)
+    console.log('receive', datas)
+    this.onMessageCallbacks.forEach(cb => cb(datas))
+  }
+
+  addOnMessageListener (cb) {
+    this.onMessageCallbacks.push(cb)
+  }
+
   /**
    * Send socket message containing a type and datas
    * @param type
@@ -44,6 +62,7 @@ class SocketClient {
    */
   send (type, datas) {
     const msg = Object.assign({}, datas, {type})
+    console.log('send', msg)
     this.instance.send(JSON.stringify(msg))
   }
 }

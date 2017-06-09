@@ -1,16 +1,21 @@
-import Tablet from './Tablet'
-import Screen from './Screen'
+import SocketListener from './SocketListener'
+
+const DEVICE_NEEDED = 2
 
 class SocketDispatcher {
+  constructor () {
+    this.devices = []
+  }
+
   setSocketServer (io) {
     this.io = io
 
     // binded event methods
     this.bindedOnConnection = this.onConnection.bind(this)
+  }
 
-    Tablet.onSocketDatasReceived = (datas) => {
-      Screen.emit('data', datas)
-    }
+  getDevice (device) {
+    return this.devices.find(d => d.device === device)
   }
 
   startDispatch () {
@@ -22,7 +27,6 @@ class SocketDispatcher {
   }
 
   onConnection (socket) {
-    console.log('receive connection')
     socket.on('data', (data) => {
       this.onData(data, socket)
     })
@@ -30,17 +34,29 @@ class SocketDispatcher {
 
   /**
    * @param datas Parsed datas received by data event
+   * @param socket
    */
   onAuth (datas, socket) {
     const device = datas['device']
 
-    switch (device) {
-      case 'screen':
-        Screen.setSocket(socket)
-        break
-      case 'tablet':
-        Tablet.setSocket(socket)
-        break
+    let socketListener = new SocketListener()
+    socketListener.setSocket(socket)
+    socketListener.setDevice(device)
+    this.devices.push(socketListener)
+
+    if (this.devices.length === DEVICE_NEEDED) {
+      const screen = this.getDevice('screen')
+      const tablet = this.getDevice('tablet')
+
+      if (screen && tablet) {
+        screen.onSocketDatasReceived = (datas) => {
+          tablet.emit(datas.type, datas)
+        }
+
+        tablet.onSocketDatasReceived = (datas) => {
+          screen.emit(datas.type, datas)
+        }
+      }
     }
   }
 

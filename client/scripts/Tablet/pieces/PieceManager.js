@@ -1,8 +1,8 @@
 import config from '../../config.json'
 import Piece from './Piece'
 
-class PieceManager {
-  start () {
+export default class PieceManager {
+  constructor () {
     this.createPieces()
   }
 
@@ -15,10 +15,5 @@ class PieceManager {
     config.pieces.forEach((pieceConfig) => {
       this.pieces[pieceConfig.id] = new Piece(pieceConfig)
     })
-
-    this.pieces['position'].onSelectionChange(0)
-    this.pieces['speed'].onSelectionChange(0)
   }
 }
-
-export default new PieceManager()
