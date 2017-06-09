@@ -6,7 +6,6 @@ import Tablet from './Tablet/Tablet'
 import SocketClient from './utils/SocketClient'
 import SoundHelper from './utils/SoundHelper'
 import {
-  isMobile,
   selectClass
 } from './utils/index'
 
@@ -26,24 +25,16 @@ export default class App {
    * Hide/show device container and start app
    */
   start () {
-    dbg('start')
-    if (!isMobile()) {
+    const hash = window.location.hash.substr(1)
+
+    if (hash === 'tablet') {
       selectClass('tablet').style.display = 'block'
       let tablet = new Tablet()
       SocketClient.setKey('tablet')
 
       Promise.all([SocketClient.start(), SoundHelper.start()])
-        .then(() => {
-          SoundHelper.play('intro_sound')
-
-          window.setTimeout(() => {
-            SoundHelper.multiPlayer.startLoop('ambient_sound')
-            SoundHelper.multiPlayer.startLoop('pulse_sound')
-            SoundHelper.getActiveSound('pulse_sound').playbackRate.rampTo(0.5, 0)
-            tablet.listenPiecesInteractions()
-          }, SoundHelper.getActiveSound('intro_sound').buffer.duration * 1000)
-        })
-    } else {
+        .then(this.onTabletLoaded.bind(this, tablet))
+    } else if (hash === 'screen') {
       selectClass('screen').style.display = 'block'
       SocketClient.setKey('screen')
       SocketClient.start()
@@ -51,6 +42,27 @@ export default class App {
           new Screen()
         })
     }
+  }
+
+  onTabletLoaded (tablet) {
+    const startButton = document.getElementsByClassName('start-experience')[0]
+    const callback = () => {
+      SoundHelper.play('intro_sound')
+
+      TweenMax.to(startButton, 0.5, {
+        autoAlpha: 0
+      })
+
+      window.setTimeout(() => {
+        SoundHelper.multiPlayer.startLoop('ambient_sound')
+        SoundHelper.multiPlayer.startLoop('pulse_sound')
+        SoundHelper.getActiveSound('pulse_sound').playbackRate.rampTo(0.5, 0)
+        tablet.listenPiecesInteractions()
+      }, SoundHelper.getActiveSound('intro_sound').buffer.duration * 1000)
+    }
+
+    startButton.addEventListener('click', callback)
+    startButton.addEventListener('touchstart', callback)
   }
 
   waitDomReady () {
