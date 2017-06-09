@@ -27,6 +27,11 @@ class SoundHelper {
     })
   }
 
+  /**
+   * Get active sound Buffer by key
+   * @param key
+   * @returns {*}
+   */
   getActiveSound (key) {
     return this.multiPlayer._activeSources[key][0]
   }

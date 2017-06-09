@@ -31,6 +31,9 @@ export default class Screen {
     this.render()
   }
 
+  /**
+   * Initialize elements
+   */
   initializeElements () {
     this.$els = {
       videoContainer: selectId('video'),
@@ -51,6 +54,9 @@ export default class Screen {
     }, 1500)
   }
 
+  /**
+   * Render image with Three JS
+   */
   render () {
     if (this.useThreeJsRenderer) {
       this.videoRenderer.render()
@@ -61,7 +67,7 @@ export default class Screen {
 
   /**
    * Event triggered when screen receive datas from tablet
-   * @param e
+   * @param datas   All datas sended by tablet
    */
   onSocketMessage (datas) {
     if (firstInteraction) {
@@ -142,6 +148,9 @@ export default class Screen {
     }, 1500)
   }
 
+  /**
+   * Get animation which correspond to state
+   */
   getAnimation () {
     return this.config.find((config) => {
       return config.position === this.state.position && config.speed === this.state.speed
@@ -150,6 +159,8 @@ export default class Screen {
 
   /**
    * Update video source with new datas (position and speed)
+   * @param animation   Animation object (urls)
+   * @param isSpeed   Used to determine glitch duration
    */
   updateAnimation (animation, isSpeed) {
     const glitchTime = (isSpeed) ? 0.6 : 1
@@ -221,21 +232,37 @@ export default class Screen {
     }
   }
 
+  /**
+   * Use Three js renderer
+   */
   renderThreeJs () {
     this.useThreeJsRenderer = true
     this.$els.videoContainer.style.display = 'none'
   }
 
+  /**
+   * Use video DOM element
+   */
   renderVideoElement () {
     this.videoRenderer.renderer.clear()
     this.useThreeJsRenderer = false
     this.$els.videoContainer.style.display = 'block'
   }
 
+  /**
+   * Utils method to add a timeout
+   * @param timeoutIdKey
+   * @param delay
+   * @param callback
+   */
   setResponseTimeout (timeoutIdKey, delay, callback) {
     this.timeoutIds[timeoutIdKey] = window.setTimeout(callback, delay)
   }
 
+  /**
+   * Utils method to remove a timeout
+   * @param timeoutIdKey
+   */
   clearResponseTimeout (timeoutIdKey) {
     if (this.timeoutIds[timeoutIdKey]) {
       clearTimeout(this.timeoutIds[timeoutIdKey])

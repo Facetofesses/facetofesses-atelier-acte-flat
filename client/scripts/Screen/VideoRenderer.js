@@ -20,6 +20,9 @@ export default class VideoRenderer {
     this.addToDOM()
   }
 
+  /**
+   * Create Three JS camera
+   */
   createCamera () {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000)
     this.camera.position.z = 400
@@ -27,6 +30,9 @@ export default class VideoRenderer {
     this.scene.add(this.camera)
   }
 
+  /**
+   * Create Three JS renderer
+   */
   createRenderer () {
     this.renderer = new THREE.WebGLRenderer({
       antialias: true
@@ -35,20 +41,32 @@ export default class VideoRenderer {
     this.renderer.setPixelRatio(window.devicePixelRatio)
   }
 
+  /**
+   * Create Three JS scene
+   */
   createScene () {
     this.scene = new THREE.Scene()
   }
 
+  /**
+   * Enable glitch
+   */
   glitch () {
     this.glitchEnabled = true
     this.glitchPass.goWild = true
   }
 
+  /**
+   * Disable glitch
+   */
   unglitch () {
     this.glitchEnabled = false
     this.glitchPass.goWild = false
   }
 
+  /**
+   * Add EffectComposer (glitch)
+   */
   addEffects () {
     this.composer = new THREE.EffectComposer(this.renderer)
     this.rendererPass = new THREE.RenderPass(this.scene, this.camera)
@@ -59,6 +77,9 @@ export default class VideoRenderer {
     this.composer.addPass(this.glitchPass)
   }
 
+  /**
+   * Create Three JS plane to print camera images
+   */
   createCameraPlane () {
     this.texture = new THREE.VideoTexture(this.videoDomElement)
     this.texture.minFilter = THREE.LinearFilter
@@ -70,10 +91,16 @@ export default class VideoRenderer {
     this.scene.add(this.scr)
   }
 
+  /**
+   * Add renderer to DOM
+   */
   addToDOM () {
     document.getElementsByClassName('screen')[0].appendChild(this.renderer.domElement)
   }
 
+  /**
+   * Render Three JS scene
+   */
   render () {
     if (!this.videoDomElement.HAVE_ENOUGH_DATA) return
     if (this.glitchEnabled) {

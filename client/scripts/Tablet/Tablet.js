@@ -16,12 +16,18 @@ export default class Tablet {
     SocketClient.addOnMessageListener(this.onSocketMessage.bind(this))
   }
 
+  /**
+   * Initialize elements
+   */
   initializeElements () {
     this.$els = {
       bubbles: selectClass('bubble', true)
     }
   }
 
+  /**
+   * Initialize events
+   */
   initializeEvents () {
     window.setTimeout(() => {
       window.addEventListener('touchmove', (e) => {
@@ -30,6 +36,9 @@ export default class Tablet {
     }, 1500)
   }
 
+  /**
+   * Enable touch interaction on each piece
+   */
   listenPiecesInteractions () {
     for (let key in this.pieceManager.pieces) {
       if (this.pieceManager.pieces.hasOwnProperty(key)) {
@@ -66,6 +75,10 @@ export default class Tablet {
     window.setInterval(bubblesAnimation, 20000)
   }
 
+  /**
+   * Called when Tablet receive socket messages
+   * @param datas
+   */
   onSocketMessage (datas) {
     if (datas.type === 'sound') {
       SoundHelper.play(datas.sound)

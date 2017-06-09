@@ -18,6 +18,11 @@ export default class PieceManager {
     })
   }
 
+  /**
+   * Called each time a piece change his selection
+   * @param pieceID
+   * @param pieceSelection
+   */
   onSelectionChange (pieceID, pieceSelection) {
     if (pieceID === 'speed') {
       const playbackRate = 0.5 + pieceSelection * 0.2

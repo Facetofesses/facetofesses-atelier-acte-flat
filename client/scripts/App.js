@@ -44,6 +44,10 @@ export default class App {
     }
   }
 
+  /**
+   * Called when all assets on tablet are loaded
+   * @param tablet
+   */
   onTabletLoaded (tablet) {
     const startButton = document.getElementsByClassName('start-experience')[0]
     const callback = () => {
@@ -65,6 +69,9 @@ export default class App {
     startButton.addEventListener('touchstart', callback)
   }
 
+  /**
+   * Wait DOM ready event
+   */
   waitDomReady () {
     dbg('wait for DOM ready')
     this.events.push(DOM_READY_EVENT)
@@ -74,6 +81,9 @@ export default class App {
     })
   }
 
+  /**
+   * Load fonts
+   */
   waitFontsReady () {
     dbg('wait for fonts ready')
     this.events.push(FONTS_READY_EVENT)
@@ -90,6 +100,10 @@ export default class App {
     })
   }
 
+  /**
+   * Called when an onload event occurs
+   * @param key
+   */
   onLoadEventSuccess (key) {
     this.events.splice(this.events.indexOf(key), 1)
     if (this.events.length === 0) {

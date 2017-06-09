@@ -43,13 +43,24 @@ class SocketClient {
     this.onOpenCallback()
   }
 
+  /**
+   * Called when socket close
+   */
   onClose () {}
 
+  /**
+   * Called on socket message
+   * @param e
+   */
   onMessage (e) {
     const datas = JSON.parse(e.data)
     this.onMessageCallbacks.forEach(cb => cb(datas))
   }
 
+  /**
+   * Add a method which be called on socket message
+   * @param cb
+   */
   addOnMessageListener (cb) {
     this.onMessageCallbacks.push(cb)
   }
