@@ -40,6 +40,9 @@ export default class Server {
     })
   }
 
+  /**
+   * Start server
+   */
   start () {
     this.server.listen(PORT, '0.0.0.0')
   }

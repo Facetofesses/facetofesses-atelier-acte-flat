@@ -14,18 +14,33 @@ class SocketDispatcher {
     this.bindedOnConnection = this.onConnection.bind(this)
   }
 
+  /**
+   * get SocketListener instance
+   * @param device
+   * @returns {*}
+   */
   getDevice (device) {
     return this.devices.find(d => d.device === device)
   }
 
+  /**
+   * Start to dispatch
+   */
   startDispatch () {
     this.addConnectionEventListener()
   }
 
+  /**
+   * Listen to connection events
+   */
   addConnectionEventListener () {
     this.io.on('connection', this.bindedOnConnection)
   }
 
+  /**
+   * Set data event listener
+   * @param socket
+   */
   onConnection (socket) {
     socket.on('data', (data) => {
       this.onData(data, socket)
@@ -49,7 +64,6 @@ class SocketDispatcher {
       const tablet = this.getDevice('tablet')
 
       if (screen && tablet) {
-        console.log('bind')
         screen.onSocketDatasReceived = (datas) => {
           tablet.emit(datas.type, datas)
         }
